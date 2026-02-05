@@ -4,5 +4,6 @@ matplotlib
 scikit-learn
 shap
 lime
-torch
+#torch
+#using torch for amd, used a special method for this.
 captum
