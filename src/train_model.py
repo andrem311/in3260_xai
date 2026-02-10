@@ -17,24 +17,27 @@ FEATURES = ["latency_ms", "throughputh_mbps","packet_loss_pct","jitter_ms","cpu_
 def main():
     #reads the data into a dataframe
     df = pd.read_csv(DATA_PATH)
-    #
     X = df[FEATURES].values
-    
     y = df[LABEL_COL].values.astype(int)
     #puts the training set into smaller random chunks 
     Xtr, Xte, ytr, yte = train_test_split(X,y,test_size=0.25, random_state=7,stratify=y)
 
     # 1) Logistic Regression (scaled)
+    #logistic regression is unlike linear regression since linear can have a lot of values on a linear gradiant
+    #logistic usally takes only two, but for this it is more than that 
+
+    #Pipleine automates data transformation
     lr = Pipeline([
         ("scaler", StandardScaler()),
         ("clf", LogisticRegression(max_iter=2000))
     ])
+    #fit modifies the parameters of the model based on the data provided, corrects errors and optimizes
     lr.fit(Xtr,ytr)
     p_lr = lr.predict_proba(Xte)[:,1]
     print("\n[LR] AUC:",roc_auc_score(yte,p_lr))
     print(classification_report(yte,(p_lr>= 0.5).astype(int)))
 
-    #2
+    #2 Forest Classifier diveds up in small groups a
     rf = RandomForestClassifier(n_estimators=300, random_state=7, class_weight="balanced")
     rf.fit(Xtr,ytr)
     p_rf = rf.predict(Xte)[:,1]
