@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 
 DATA_PATH = "data/synthetic_with_detections.csv"
 LABEL_COL = "is_anom"
-
+#works
 def main():
     rf = joblib.load("models/rf.joblib")
     features = joblib.load("models/features.joblib")
@@ -19,7 +19,7 @@ def main():
 
     Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.25, random_state=7, stratify=y)
 
-    r = permutation_importance(rf,Xte, yte, n_repeats=10, random_state=7, scoring="fi")
+    r = permutation_importance(rf,Xte, yte, n_repeats=10, random_state=7, scoring="f1")
     imp = r.importances_mean
     order = np.argsort(-imp)
 

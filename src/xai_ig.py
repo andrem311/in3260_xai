@@ -24,7 +24,7 @@ class MLP(nn.Module):
     def forward(self,x):
         return self.net(x).squeeze(-1)
 
-
+#works
 def main():
     df = pd.read_csv(DATA_PATH)
     X = df[FEATURES].values.astype(np.float32)
@@ -37,7 +37,7 @@ def main():
     Xte = scaler.transform(Xte).astype(np.float32)
 
     device = "cpu"
-    model = MLP(d=Xtr.shape[1].to(device))
+    model = MLP(d=Xtr.shape[1]).to(device)
     opt = torch.optim.Adam(model.parameters(),lr = 1e-3)
     loss_fn = nn.BCEWithLogitsLoss()
 
@@ -65,6 +65,7 @@ def main():
     attr = ig.attribute(x,baselines=baseline, target=None).detach().cpu().numpy().reshape(-1)
 
     order = np.argsort(-np.abs(attr))
+    print(order)
     print(f"\n[IG] Local explanation (abs attribution) for one anomaly test sample idx={idx}:")
     for j in order[:5]:
         print(f"{FEATURES[j]}: IG={attr[j]:.4f}")
