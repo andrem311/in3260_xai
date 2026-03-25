@@ -8,7 +8,7 @@ LABEL_COL = "is_anom"
 #works
 def main():
     # rf = joblib.load("models/rf.joblib")
-    # we look at the logistic regression instead since this xai does better with differentiable models
+    # we look at the logistic regression instead since this xai(might not be correct) does better with differentiable models
     # rather than non-differentiable ones. 
     lr = joblib.load("models/lr.joblib") 
     features = joblib.load("models/features.joblib")
