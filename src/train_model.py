@@ -20,12 +20,12 @@ def main():
     df = pd.read_csv(DATA_PATH)
     X = df[FEATURES].values
     y = df[LABEL_COL].values.astype(int)
-    #puts the training set into smaller random chunks 
+    #puts the training set into smaller(75%) random chunks 
     Xtr, Xte, ytr, yte = train_test_split(X,y,test_size=0.25, random_state=7,stratify=y)
 
     # 1) Logistic Regression (scaled)
     #logistic regression is unlike linear regression since linear can have a lot of values on a linear gradiant
-    #logistic usally takes only two, but for this it is more than that 
+    #logistic usally takes only two(0-1), but for this it is more than that 
 
     #Pipleine automates data transformation
     lr = Pipeline([

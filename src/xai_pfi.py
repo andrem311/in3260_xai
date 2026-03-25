@@ -11,7 +11,7 @@ LABEL_COL = "is_anom"
 def main():
     rf = joblib.load("models/rf.joblib")
     features = joblib.load("models/features.joblib")
-
+    
     df = pd.read_csv(DATA_PATH)
     X = df[features].values
     y = df[LABEL_COL].values.astype(int)
@@ -26,6 +26,8 @@ def main():
     print("\n[PFI] Global importance (higher = more important):")
     for idx in order:
         print(f"{features[idx]}: {imp[idx]:.4f}")
+    np.save("outputs/pfi_scores.npy",r.importances)
+
 
     
 if __name__ == "__main__":

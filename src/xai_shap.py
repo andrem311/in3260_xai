@@ -23,18 +23,24 @@ def main():
     print(rf)
 
     # pick a small background set for speed
-    background = shap.sample(Xtr, 200, random_state=7)
+    # background = shap.sample(Xtr, 200, random_state=7)
+    background = shap.sample(X, 200, random_state=7)
 
     # explainer = shap.TreeExplainer(rf)
 
+    # explainer = shap.TreeExplainer(rf,data=background,feature_names=features)
     explainer = shap.TreeExplainer(rf,data=background,feature_names=features)
     # explainer = shap.Explainer(lr,feature_names=features)
-    sv = explainer(Xtr)
-    exp = shap.Explanation(sv.values[:,:,1], sv.base_values[:,1],data=Xtr,feature_names=features)
+    # sv = explainer(Xtr)
+    sv = explainer(X)
+    # exp = shap.Explanation(sv.values[:,:,1], sv.base_values[:,1],data=Xtr,feature_names=features)
+    exp = shap.Explanation(sv.values[:,:,1], sv.base_values[:,1],data=X,feature_names=features)
+    np.save("outputs/shap_scores.npy",exp.values)
     # shap_values = explainer.shap_values(Xtr)
     print("explainer:")
     print(exp[0,0])
     print(type(exp))
+    print(len(exp))
     print(exp[0])
     # np.shape(shap_values)
     # beeswarm(shap_values)
@@ -51,8 +57,8 @@ def main():
     # print("Shap values")
     # is a tripple dime
     # print(shap_values)
-    shap.summary_plot(exp)
-    shap.waterfall_plot(exp[0])
+    # shap.summary_plot(exp)
+    # shap.waterfall_plot(exp[40])
     # global_imp = np.mean(np.abs(sv), axis=0)
     # order = np.argsort(-global_imp)
     # print(order)
