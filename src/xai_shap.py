@@ -24,7 +24,7 @@ def main():
 
     # pick a small background set for speed
     # background = shap.sample(Xtr, 200, random_state=7)
-    background = shap.sample(Xtr, 200, random_state=7)
+    background = shap.sample(X, 200, random_state=7)
 
     # explainer = shap.TreeExplainer(rf)
 
