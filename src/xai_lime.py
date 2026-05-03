@@ -1,13 +1,14 @@
 import joblib
+import time
 import numpy as np
 import pandas as pd
 from lime.lime_tabular import LimeTabularExplainer
 
-DATAPATH = "data/synthetic_with_detections.csv"
-LABEL_COL = "is_anom"
+DATAPATH = "data/synthetic_network_system_short.csv"
+LABEL_COL = "is_event"
 #works
 def main():
-    # rf = joblib.load("models/rf.joblib")
+    rf = joblib.load("models/rf.joblib")
     # we look at the logistic regression instead since this xai(might not be correct) does better with differentiable models
     # rather than non-differentiable ones. 
     lr = joblib.load("models/lr.joblib") 
@@ -22,13 +23,58 @@ def main():
                                      mode="classification",discretize_continuous=True)
     
     idx = int(np.where(y==1)[0][0])
-    # exp = explainer.explain_instance(data_row=X[idx], predict_fn=rf.predict_proba, num_features=7)
-    exp = explainer.explain_instance(data_row=X[idx], predict_fn=lr.predict_proba, num_features=7)
-    print(exp.as_list())
+    exp = explainer.explain_instance(data_row=X[idx], predict_fn=rf.predict_proba, num_features=7)
+    List_exp = []
+    start_time = time.clock_gettime(1)
+    for row in X:
+        exp = explainer.explain_instance(data_row=row, predict_fn=lr.predict_proba, num_features=7)
+        List_exp.append(exp)
+    end_time = time.clock_gettime_ns(1)
+
+    print("time for lime: ", end_time-start_time)
+    # exp_m = exp.as_map()
+    # print(type(exp_m[1][0]))
+    print("start the ordering")
+    #we do this costly operation to reorder it corretly for the eval_driver, where we use the scores 
+    list_all_instances = []
+    for exp_x in List_exp:
+        list_order = []
+        # Turn the explanation object to a map so we can easily work on it.
+        exp_m = exp_x.as_map()
+        # Seven indexes that need to be sorted
+        for index in range(0,7):
+            #access the tuples inside
+            for idex_2 in exp_m[1]:
+                #look at the first element to see where it should go
+                if idex_2[0] == index:
+                    #get the item, so no np values, but rather normal floats 
+                    list_order.append((idex_2[1].item()))
+        #apppend one row/minute to the list            
+        list_all_instances.append(list_order)
+    
+    np.save("outputs/lime_scores.npy",list_all_instances)
+
+    print(f"\n[LIME] Global Explenation(MEAN):")
+    mean_of_lime = np.mean(np.abs(list_all_instances), axis=0)
+    order = reversed(np.argsort(mean_of_lime))
+    for j in order:
+        print(f"{features[j]}: {mean_of_lime[j]:.4f}")
+    # print(list_order)
+    # print(type(exp))
+    # print(exp.as_list())
+    # count = 0
+    # for exp_x in List_exp:
+
+
+
+
     print(f"\n[LIME] Explanation for sample idx={idx}:")
     for feat, w in exp.as_list():
         print(f"{feat}: weight={w:.4f}")
-
+    # count += 1
+    # print()
+    # if count > 40:
+    #     break
 
 if __name__ == "__main__":
     main()

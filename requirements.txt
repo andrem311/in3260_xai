@@ -7,3 +7,6 @@ lime
 #torch
 #using torch for amd, used a special method for this.
 captum
+psutil
+pythonping
+speedtest-cli

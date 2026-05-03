@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 from shap.plots import beeswarm
 
 
-DATA_PATH = "data/synthetic_with_detections.csv"
+DATA_PATH = "data/synthetic_with_detections_short.csv"
 LABEL_COL = "is_anom"
 
 def main():
@@ -17,10 +17,12 @@ def main():
     df = pd.read_csv(DATA_PATH)
     print(df.head())
     X = df[features].values
+    # to use iloc further down
+    X1 = df[features]
     y = df[LABEL_COL].values.astype(int)
     print(features)
     Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.25, random_state=7, stratify=y)
-    print(rf)
+    print(X1)
 
     # pick a small background set for speed
     # background = shap.sample(Xtr, 200, random_state=7)
@@ -38,8 +40,8 @@ def main():
 
     # exp = shap.Explanation(sv.values[:,:,1], sv.base_values[:,1],data=Xtr,feature_names=features)
     exp = shap.Explanation(sv.values[:,:,1], sv.base_values[:,1],data=X,feature_names=features)
-
     
+    print(exp[0])
     np.save("outputs/shap_scores.npy",exp.values)
     # shap_values = explainer.shap_values(Xtr)
     # print("explainer:")
@@ -49,6 +51,7 @@ def main():
     # print(exp[0])
     print("EXP mean:")
     print(sv.mean(0)) # global vaules (or just some arbitrary value)
+    sv_mean = sv.mean(0)
     
     # np.shape(shap_values)
     # beeswarm(shap_values)
@@ -61,24 +64,29 @@ def main():
     #     sv = shap_values
 
     # shap.summary_plot(exp)
+    # print("EXP MEAN: abs")
+    # print(exp.mean(0).abs)
+    
+    mean_from_exp = exp.mean(0).abs.values.tolist()
+    #not a np array and need to do some list manipulation
+    order_pre = reversed(np.argsort(mean_from_exp))
+    # order_pre = reversed(order_pre)
+
     # shap.waterfall_plot(exp[40])
-    # global_imp = np.mean(np.abs(sv), axis=0)
+    # global_imp = np.mean(np.abs(sv.data), axis=0)
     # order = np.argsort(-global_imp)
     
-    # print("\n[SHAP] Global importance (mean |SHAP|):")
-
-
-
-    # for j in order:
-        # print(f"{features[j]}: {global_imp[j]:.4f}")
+    print("\n[SHAP] Global importance (mean |SHAP|):")
+    for j in order_pre:
+        print(f"{features[j]}: {mean_from_exp[j]:.4f}")
 
     # Local explanation: pick one anomaly row
-    # idx = int(np.where(y == 1)[0][0])
-    # local = sv[idx]
-    # order_local = np.argsort(-np.abs(local))
-    # print(f"\n[SHAP] Local explanation for sample idx={idx}:")
-    # for j in order_local[:5]:
-        # print(f"{features[j]}: shap={local[j]:.4f}, value={X.iloc[idx, j]}")
+    idx = int(np.where(y == 1)[0][0])
+    local = exp[idx].values.tolist()
+    order_local = np.argsort(-np.abs(local))
+    print(f"\n[SHAP] Local explanation for sample idx={idx}:")
+    for j in order_local[:7]:
+        print(f"{features[j]}: shap={local[j]:.4f}, value={X1.iloc[idx, j]}")
 
 if __name__ == "__main__":
     main()

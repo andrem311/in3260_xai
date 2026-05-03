@@ -115,7 +115,7 @@ def plot_signals(df: pd.DataFrame, out_dir = "figs"):
         plt.close()
 
 def main():
-    in_path = os.path.join("data","synthetic_network_system.csv")
+    in_path = os.path.join("data","synthetic_network_system_short.csv")
     df = pd.read_csv(in_path)
 
     df2 = detect_events(df,win = 60, z_thr = 3.0, min_metrics=2)
@@ -136,7 +136,7 @@ def main():
 
     plot_signals(df2,out_dir= "figs")
 
-    out_path = os.path.join("data", "synthetic_with_detections.csv")
+    out_path = os.path.join("data", "synthetic_with_detections_short.csv")
     df2.to_csv(out_path, index=False)
     print(f"[OK] Saved: {out_path}")
     print("[OK] Saved plots in figs/")

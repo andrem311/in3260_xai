@@ -5,8 +5,8 @@ import pandas as pd
 from sklearn.inspection import permutation_importance
 from sklearn.model_selection import train_test_split
 
-DATA_PATH = "data/synthetic_with_detections.csv"
-LABEL_COL = "is_anom"
+DATA_PATH = "data/synthetic_network_system_short.csv"
+LABEL_COL = "is_event"
 #works, but can not be used in eval_driver_recovery...
 def main():
     rf = joblib.load("models/rf.joblib")

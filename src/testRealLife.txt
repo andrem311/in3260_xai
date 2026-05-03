@@ -1,0 +1,15 @@
+PING google.com (172.217.20.174) 56(84) bytes of data.
+64 bytes from lcarnb-ag-in-f14.1e100.net (172.217.20.174): icmp_seq=1 ttl=110 time=9.43 ms
+64 bytes from lcarnb-ag-in-f14.1e100.net (172.217.20.174): icmp_seq=2 ttl=110 time=11.2 ms
+64 bytes from lcarnb-ag-in-f14.1e100.net (172.217.20.174): icmp_seq=3 ttl=110 time=11.2 ms
+64 bytes from lcarnb-ag-in-f14.1e100.net (172.217.20.174): icmp_seq=4 ttl=110 time=12.4 ms
+64 bytes from lcarnb-ag-in-f14.1e100.net (172.217.20.174): icmp_seq=5 ttl=110 time=11.1 ms
+
+--- google.com ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 4006ms
+rtt min/avg/max/mdev = 9.425/11.062/12.418/0.954 ms
+ bla bla
+Bla bla bla
+Bla bla bla
+Bla bla bla
+Bla bla blaBla bla blaBla bla bla

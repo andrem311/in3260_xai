@@ -9,9 +9,10 @@ from sklearn.preprocessing import StandardScaler
 from captum.attr import IntegratedGradients
 from train_model import MLP
 # from sklearn
-DATA_PATH = "data/synthetic_with_detections.csv"
-LABEL_COL = "is_anom"
-FEATURES = ["latency_ms","throughput_mbps","packet_loss_pct","jitter_ms","cpu_pct","mem_pct","io_ms"]
+DATA_PATH = "data/synthetic_network_system_short.csv"
+LABEL_COL = "is_event"
+FEATURES = joblib.load("models/features.joblib") 
+# FEATURES = ["latency_ms","throughput_mbps","packet_loss_pct","jitter_ms","cpu_pct","mem_pct","io_ms"]
 
 
 
@@ -28,25 +29,47 @@ def main():
     idx = int(np.where(yte == 1)[0][0])
 
 
-    #our own made by pythourch
+    #our own made by pythourch and not one from scikit learn
     model = joblib.load("models/mlp.joblib")
     model.eval()
-    for i in range(40,50):
-        x = torch.tensor(Xte[i:i+1]).to(device)
-        print(torch.sigmoid(model(x)))
+    # for i in range(40,50):
+    #     x = torch.tensor(Xte[i:i+1]).to(device)
+    #     print(torch.sigmoid(model(x)))
         
     
     x = torch.tensor(Xte[idx:idx+1]).to(device)
     baseline = torch.zeros_like(x)
+    #this line is very slow. 
     ig = IntegratedGradients(lambda inp : torch.sigmoid(model(inp)))
+
     attr = ig.attribute(x,baselines=baseline,target=None).detach().cpu().numpy().reshape(-1)
     order = np.argsort(-np.abs(attr))
-    print(order)
+    # print(order)
     print(f"\n[IG] Local explanation (abs attribution) for one anomaly test sample idx={idx}:")
-    for j in order[:5]:
+    for j in order[:7]:
         print(f"{FEATURES[j]}: IG={attr[j]:.4f}")
+    complete_list = []
+    for i in range(len(X)):
+        x = torch.tensor(X[i:i+1]).to(device)
+        attr_row = ig.attribute(x,baselines=baseline,target=None).detach().cpu().numpy().reshape(-1)
+        complete_list.append(attr_row)
+    
+    np.save("outputs/ig_scores.npy",complete_list)
 
+
+    print(f"\n[IG] Global Explenation(MEAN):")
+    mean_of_ig = (np.mean(np.abs(complete_list), axis=0))
+    order = reversed(np.argsort(mean_of_ig))
+    for j in order:
+        print(f"{FEATURES[j]}: {mean_of_ig[j]:.4f}")
+
+    # print(attr)
+    # for j in range(7):
+    #     print(f"{FEATURES[j]}: IG={attr[j]:.4f}")
+    
+    
     # model.eval()
+    """
     #The one made by scikit learn
     model = joblib.load("models/mlp_s.joblib")
     for i in range(40, 300):
@@ -64,11 +87,7 @@ def main():
     print(f"\n[IG] Local explanation (abs attribution) for one anomaly test sample idx={idx}:")
     for j in order[:5]:
         print(f"{FEATURES[j]}: IG={attr[j]:.4f}")
-
-
-
-
-
+    """
 
 
 if __name__ == "__main__":

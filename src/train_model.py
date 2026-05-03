@@ -21,8 +21,8 @@ from sklearn.metrics import roc_curve
  
 
 
-DATA_PATH = "data/synthetic_with_detections.csv"
-LABEL_COL = "is_anom"
+DATA_PATH = "data/synthetic_network_system.csv"
+LABEL_COL = "is_event"
 FEATURES = ["latency_ms","throughput_mbps","packet_loss_pct","jitter_ms","cpu_pct","mem_pct","io_ms"]
 
 class MLP(nn.Module):
@@ -55,7 +55,7 @@ class MLP(nn.Module):
 
 def main():
     #reads the data into a dataframe
-    print("hello")
+    # print("hello")
     df = pd.read_csv(DATA_PATH)
     X = df[FEATURES].values
     y = df[LABEL_COL].values.astype(int)
@@ -79,8 +79,8 @@ def main():
     # set the zero_division to 0.0 so that there are no error messages shown.
     print(classification_report(yte,(p_lr>= 0.5).astype(int),zero_division=0.0))
 
-    #2 Forest Classifier diveds up in small groups and 
-    rf = RandomForestClassifier(n_estimators=300, random_state=7, class_weight="balanced")
+    #2 Forest Classifier diveds up in small groups and  //random state 7, 5 best
+    rf = RandomForestClassifier(n_estimators=300, random_state=90, class_weight="balanced")
     rf.fit(Xtr,ytr)
     
     
@@ -135,12 +135,12 @@ def main():
     # p_mlp = model.
     # print(classification_report(yte,(p_mlp>=0.5).astype(int)))
     joblib.dump(model, "models/mlp.joblib")
-    print("\n[OK] Saved models in models. MLP")
+    # print("\n[OK] Saved models in models. MLP")
     # auc = AUROC()
     # prob = nnf.softmax()
     model.eval()
     outputMLP = model(torch.tensor(Xte))
-    print("output of model:")
+    # print("output of model:")
     # print(outputMLP)
     probs_mlp = nnf.softmax(outputMLP,dim=0)
     probs_mlp1 = nnf.softmax(outputMLP,dim=-1)
@@ -178,7 +178,7 @@ def main():
     from sklearn.neural_network import MLPClassifier
     Xtr, Xte, ytr, yte = train_test_split(X,y,test_size=0.25, random_state=7,stratify=y)
 
-    clf = MLPClassifier(solver='adam',alpha=1e-5,activation='relu',hidden_layer_sizes=(7,2), random_state= 7)
+    clf = MLPClassifier(solver='lbfgs',alpha=1e-5,hidden_layer_sizes=(7,4),random_state=5)
 
     clf.fit(Xtr,ytr)
     #we use predict_proba to get the chances, but to use the model we just use predict
@@ -186,10 +186,13 @@ def main():
     # print()
     # print(rf.predict(Xte))
     # print()
-    u1 = 700
-    u2 = 800
-    print(lr.predict(X[u1:u2]))
-    print((y[u1:u2]))
+    # u1 = 700
+    # u2 = 800
+    # print(model(torch.tensor(X[u1:u2])))
+    # print()
+    # print(clf.predict(X[u1:u2]))
+
+    # print((y[u1:u2]))
     # print(lr.predict(Xte))
     # print()
     # print(yte)
