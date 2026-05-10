@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from lime.lime_tabular import LimeTabularExplainer
 
-DATAPATH = "data/synthetic_network_system_short.csv"
+DATAPATH = "data/synthetic_network_system_hard.csv"
 LABEL_COL = "is_event"
 #works
 def main():
@@ -25,11 +25,11 @@ def main():
     idx = int(np.where(y==1)[0][0])
     exp = explainer.explain_instance(data_row=X[idx], predict_fn=rf.predict_proba, num_features=7)
     List_exp = []
-    start_time = time.clock_gettime(1)
+    start_time = time.time()
     for row in X:
         exp = explainer.explain_instance(data_row=row, predict_fn=lr.predict_proba, num_features=7)
         List_exp.append(exp)
-    end_time = time.clock_gettime_ns(1)
+    end_time = time.time()
 
     print("time for lime: ", end_time-start_time)
     # exp_m = exp.as_map()

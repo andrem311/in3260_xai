@@ -110,7 +110,7 @@ for i in range(1):
     logfile    = "/var/log/speedtest.log"
 
     downstream = "{0:,.2f} Mb".format(float(isp.download()/10**6))
-    upstream   = "{0:,.2f} Mb".format(float(isp.upload()/10**6))
+    # upstream   = "{0:,.2f} Mb".format(float(isp.upload()/10**6))
     latency    = "{0:,.0f} ms".format(float(srv['latency']))
     update     =  datetime.strftime(datetime.now(),'%d/%m/%y %I:%M%p')
     

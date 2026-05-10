@@ -9,7 +9,7 @@ from sklearn.preprocessing import StandardScaler
 from captum.attr import IntegratedGradients
 from train_model import MLP
 # from sklearn
-DATA_PATH = "data/synthetic_network_system_short.csv"
+DATA_PATH = "data/synthetic_network_system_hard.csv"
 LABEL_COL = "is_event"
 FEATURES = joblib.load("models/features.joblib") 
 # FEATURES = ["latency_ms","throughput_mbps","packet_loss_pct","jitter_ms","cpu_pct","mem_pct","io_ms"]
@@ -39,7 +39,7 @@ def main():
     
     x = torch.tensor(Xte[idx:idx+1]).to(device)
     baseline = torch.zeros_like(x)
-    #this line is very slow. 
+    
     ig = IntegratedGradients(lambda inp : torch.sigmoid(model(inp)))
 
     attr = ig.attribute(x,baselines=baseline,target=None).detach().cpu().numpy().reshape(-1)

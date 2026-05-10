@@ -6,13 +6,14 @@ from sklearn.model_selection import train_test_split
 from shap.plots import beeswarm
 
 
-DATA_PATH = "data/synthetic_with_detections_short.csv"
-LABEL_COL = "is_anom"
+DATA_PATH = "data/synthetic_network_system_hard.csv"
+# DATA_PATH = "data/synthetic_network_system_hard.csv"
+LABEL_COL = "is_event"
 
 def main():
     shap.initjs()
     rf = joblib.load("models/rf.joblib")
-    lr = joblib.load("models/lr.joblib")
+    # lr = joblib.load("models/lr.joblib")
     features = joblib.load("models/features.joblib")
     df = pd.read_csv(DATA_PATH)
     print(df.head())
@@ -30,7 +31,6 @@ def main():
 
     # explainer = shap.TreeExplainer(rf)
 
-    # explainer = shap.TreeExplainer(rf,data=background,feature_names=features)
     explainer = shap.TreeExplainer(rf,data=background,feature_names=features)
     # explainer = shap.Explainer(lr,feature_names=features)
     # sv = explainer(Xtr)
