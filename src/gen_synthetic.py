@@ -22,18 +22,6 @@ def generate_synthetic(n_minutes=24*60,freq="1min",seed=42,p_event=0.02,is_hard 
     t = np.arange(n_minutes)
     day=daily_pattern(t)
 
-    # Base (normal) metrics with daily pattern + noise
-    #You can adjust these to make more/less challenging scenarios
-    # # normal set
-    # latency_ms = 20 +25*day + np.random.normal(0,2.0,n_minutes)
-    # throughput_mbps = 200- 60*day + np.random.normal(0,5.0,n_minutes)
-    # packet_loss_pct = 0.2 + 0.5*day + np.random.normal(0,0.08,n_minutes)
-    # jitter_ms = 2 + 4*day + np.random.normal(0,0.4,n_minutes)
-
-    # cpu_pct = 20 + 35*day +np.random.normal(0,3.0,n_minutes)
-    # mem_pct = 35 + 15*day + np.random.normal(0,1.5,n_minutes)
-    # io_ms = 3 + 6*day + np.random.normal(0,0.6,n_minutes)
-
     #harder set
     if (is_hard == 1):
 
@@ -98,7 +86,7 @@ def generate_synthetic(n_minutes=24*60,freq="1min",seed=42,p_event=0.02,is_hard 
 
         else:
             i +=1 
-
+    #clip to reasonable edges 
     packet_loss_pct = np.clip(packet_loss_pct,0.0,10.0)
     throughput_mbps = np.clip(throughput_mbps,0.0,None)
     latency_ms = np.clip(latency_ms,1.0,None)
@@ -117,9 +105,10 @@ def generate_synthetic(n_minutes=24*60,freq="1min",seed=42,p_event=0.02,is_hard 
 
 def main():
     out_dir = "data"
+    #set 0 for easy data sets
     is_hard = 1
     os.makedirs(out_dir,exist_ok=True)
-    #for one month
+    #for one day
     df = generate_synthetic(n_minutes=24*60*30, seed=7,p_event=0.01,is_hard=0)
     out_path = os.path.join(out_dir,"synthetic_network_system.csv")
     df.to_csv(out_path,index=False)
@@ -132,10 +121,7 @@ def main():
     df_short = generate_synthetic(n_minutes=24*60,seed = 5, p_event=0.01, is_hard =0)
     out_path_short = os.path.join(out_dir,"synthetic_network_system_short.csv")
     df_short.to_csv(out_path_short,index=False)
-    # print(f"[OK] Saved: {out_path}")
-    # print(df.head())
-    # print("\nEvent counts:")
-    # print(df["event_type"].value_counts())
+
 
 if __name__ == "__main__":
     main()

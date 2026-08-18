@@ -3,3 +3,11 @@ token.txt
 /.venv
 models/
 outputs/
+data/real_data_windows.csv
+data/real_network_system.csv
+figs/LIME_Real_LR.png
+figs/LIME_Real_RF.png
+figs/LIME_SYNTHIC_ANOMALY.png
+figs/SHAP_REAL_LR.png
+figs/SHAP_REAL_RF.png
+src/__pycache__/train_model.cpython-312.pyc

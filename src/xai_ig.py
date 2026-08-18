@@ -25,19 +25,22 @@ def main():
 
     Xtr,Xte,ytr,yte = train_test_split(X,y,test_size=0.25,random_state=7,stratify=y)
 
+    
     device = "cpu"
     idx = int(np.where(yte == 1)[0][0])
 
-
+    #there could be problems
     #our own made by pythourch and not one from scikit learn
     model = joblib.load("models/mlp.joblib")
+    scaler = joblib.load("models/scaler.joblib")
+    #stops influencing the model, so that testing can be done without fear of ruining the model
     model.eval()
-    # for i in range(40,50):
-    #     x = torch.tensor(Xte[i:i+1]).to(device)
-    #     print(torch.sigmoid(model(x)))
-        
     
+    Xte = scaler.transform(Xte).astype(np.float32)
+
+    #turn input to tensor
     x = torch.tensor(Xte[idx:idx+1]).to(device)
+    #a baseline of zeros 
     baseline = torch.zeros_like(x)
     
     ig = IntegratedGradients(lambda inp : torch.sigmoid(model(inp)))
@@ -48,6 +51,7 @@ def main():
     print(f"\n[IG] Local explanation (abs attribution) for one anomaly test sample idx={idx}:")
     for j in order[:7]:
         print(f"{FEATURES[j]}: IG={attr[j]:.4f}")
+    #for global explanation and testscores for the eval driver recovery
     complete_list = []
     for i in range(len(X)):
         x = torch.tensor(X[i:i+1]).to(device)
@@ -63,13 +67,10 @@ def main():
     for j in order:
         print(f"{FEATURES[j]}: {mean_of_ig[j]:.4f}")
 
-    # print(attr)
-    # for j in range(7):
-    #     print(f"{FEATURES[j]}: IG={attr[j]:.4f}")
-    
-    
-    # model.eval()
     """
+    #To test if sci kit learn models could be used with integrated gradients,
+    #deemed not necesarry and not continued...
+
     #The one made by scikit learn
     model = joblib.load("models/mlp_s.joblib")
     for i in range(40, 300):

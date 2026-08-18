@@ -8,21 +8,14 @@ EXPECTED_DRIVERS = {
     "io": {"io_ms", "latency_ms", "throughput_mbps"}
 }
 
+#does a sort of the best features
 def topk_features(scores, feature_names, k=5):
     idx = np.argsort(-np.abs(scores))[:k]
-    # for j in idx:
-    #     print(feature_names[j])
-    # print()
-    # print(idx)
-    # print()
 
     return {feature_names[j] for j in idx}
 
+# a simple intersection chekc to see what is in the topk variables
 def driver_recovery_at_k(topk_set, expected_set):
-    # print(topk_set)
-    # print()
-    # print()
-    # print(expected_set)
     return len(topk_set.intersection(expected_set))/ max(1,len(expected_set))
 
 
@@ -63,7 +56,6 @@ def evaluate_driver_recovery(df, feature_names, method_to_scores, k=5):
 
 if __name__ == "__main__":
     df = pd.read_csv("data/synthetic_network_system_short.csv")
-    # feature_names = list(np.load("models/features.npy",allow_pickle=True))
     feature_names = joblib.load("models/features.joblib")
     print(feature_names)
 
@@ -80,8 +72,8 @@ if __name__ == "__main__":
         # "PFI": pfi_scores
     }
 
-    _,table = evaluate_driver_recovery(df,feature_names=feature_names,method_to_scores=methods_to_score,k=5)
-
+    res,table = evaluate_driver_recovery(df,feature_names=feature_names,method_to_scores=methods_to_score,k=5)
+    
     print("\nDriver Recovery Table (mean DR@5): \n ")
     print(table.round(3))
     table.to_csv("outputs/driver_recovery_table.csv")

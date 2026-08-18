@@ -2,10 +2,14 @@ import joblib
 import time
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from lime.lime_tabular import LimeTabularExplainer
 
-DATAPATH = "data/synthetic_network_system_hard.csv"
+DATAPATH_REAL = "data/real_data_windows.csv"
+DATAPATH_TEST = "data/synthetic_network_system_hard.csv"
+DATAPATH = "data/synthetic_network_system_short.csv"
 LABEL_COL = "is_event"
+REAL = 0
 #works
 def main():
     rf = joblib.load("models/rf.joblib")
@@ -14,19 +18,27 @@ def main():
     lr = joblib.load("models/lr.joblib") 
     features = joblib.load("models/features.joblib")
     df = pd.read_csv(DATAPATH)
+    X = df[features].values  
 
-    X = df[features].values
-    y = df[LABEL_COL].values.astype(int)
+    df_real = pd.read_csv(DATAPATH)
+    y = df_real[LABEL_COL].values.astype(int)
+    if(REAL == 1):
+        df_real = pd.read_csv(DATAPATH_REAL)
+        y = []
+    X_REAL = df_real[features].values
 
     explainer = LimeTabularExplainer(training_data=X,
                                      feature_names=features,class_names=["normal","anomaly"],
                                      mode="classification",discretize_continuous=True)
     
-    idx = int(np.where(y==1)[0][0])
-    exp = explainer.explain_instance(data_row=X[idx], predict_fn=rf.predict_proba, num_features=7)
+
+    # exp = explainer.explain_instance(data_row=X[idx], predict_fn=rf.predict_proba, num_features=7)
     List_exp = []
     start_time = time.time()
-    for row in X:
+    for row in X_REAL:
+        #to keep it simple, it is simply the matter of commenting in and out to check either random forest or lr
+        #random forrest is a lot slower than what logistic regression is
+        # exp = explainer.explain_instance(data_row=row, predict_fn=rf.predict_proba, num_features=7)
         exp = explainer.explain_instance(data_row=row, predict_fn=lr.predict_proba, num_features=7)
         List_exp.append(exp)
     end_time = time.time()
@@ -59,22 +71,25 @@ def main():
     order = reversed(np.argsort(mean_of_lime))
     for j in order:
         print(f"{features[j]}: {mean_of_lime[j]:.4f}")
-    # print(list_order)
-    # print(type(exp))
-    # print(exp.as_list())
-    # count = 0
-    # for exp_x in List_exp:
 
+    idx = 5
+    #if the it is the testing set we look up.
+    if len(y) != 0:
+        idx = int(np.where(y==1)[0][0])
 
-
+    fig = List_exp[idx].as_pyplot_figure()
+    # fig
+    #for running it in the shell of linux on venv, or else it will open and close for a short period of time
+    #for saving it is best with some manual editing as the proportions are not correct when simply saving normally
+    plt.show(block=True)
+    #for directly saving image, (proportions not correct, most likely)
+    # fig.savefig('lime_report.jpg')
 
     print(f"\n[LIME] Explanation for sample idx={idx}:")
-    for feat, w in exp.as_list():
+    print(List_exp[idx].as_list())
+    for feat, w in List_exp[idx].as_list():
         print(f"{feat}: weight={w:.4f}")
-    # count += 1
-    # print()
-    # if count > 40:
-    #     break
+    
 
 if __name__ == "__main__":
     main()
